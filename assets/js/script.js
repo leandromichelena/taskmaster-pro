@@ -13,9 +13,37 @@ var createTask = function(taskText, taskDate, taskList) {
   // append span and p element to parent li
   taskLi.append(taskSpan, taskP);
 
+  // check due date
+  auditTask(taskLi);
 
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
+};
+
+// categorize the tasks by their due date
+var auditTask = function (taskEl) {
+  // get date from task element
+  var date = $(taskEl).find("span").text().trim();
+  // ensure it worked
+  console.log(date);
+
+  // convert to moment object at 5:00pm
+  var time = moment(date, "L").set("hour", 17)
+
+  // this should print out an object for the value of the date variable, but at 5:00pm of that date
+  console.log("time is " + time);
+
+  // remove any old classes from element
+  $(taskEl).removeClass("list-group-item-warning list-group-item-danger");
+
+  // apply new class if task is near/over due date
+  if (moment().isAfter(time)) {
+    $(taskEl).addClass("list-group-item-danger");
+    console.log("task is late");
+  }
+  else if (Math.abs(moment().diff(time, "days")) <= 2) {
+    $(taskEl).addClass("list-group-item-warning");
+  }
 };
 
 var loadTasks = function() {
@@ -92,7 +120,7 @@ $(".list-group").on("blur", "textarea", function() {
 });
 
 // editing due date by clicking it
-$(".list-group").on("click", "span", function(){
+$(".list-group").on("click", "span", function () {
   // get current text
   var date = $(this)
   .text()
@@ -100,19 +128,27 @@ $(".list-group").on("click", "span", function(){
 
   // create new input element
   var dateInput = $("<input>")
-  .attr("type", "text") // attr method with two arguments sets an attribute (type="text")
+  .attr("type", "text")
   .addClass("form-control")
   .val(date);
 
-  // swap out elements
   $(this).replaceWith(dateInput);
 
-  // automatically focus on new element
+  // enable jquery ui datepicker
+  dateInput.datepicker({
+    minDate: 0,
+    onClose: function () {
+      // when calendar is closed, force a "change" event on the `dateInput`
+      $(this).trigger("change");
+    }
+  });
+
+  // automatically bring up the calendar
   dateInput.trigger("focus");
 });
 
 // save the new value of due date
-$(".list-group").on("blur", "input[type='text']", function(){
+$(".list-group").on("change", "input[type='text']", function(){
   // get current text
   var date = $(this)
   .val()
@@ -140,6 +176,9 @@ $(".list-group").on("blur", "input[type='text']", function(){
 
   // replace input with span element
   $(this).replaceWith(taskSpan);
+
+  // Pass task's <li> element into auditTask() to check new due date
+  auditTask($(taskSpan).closest(".list-group-item"));
 });
 
 
@@ -253,6 +292,11 @@ $("#trash").droppable({
     // console.log("out");
   }
 });
+
+// adds the date picker calendar using JQuery UI
+$("#modalDueDate").datepicker({
+  minDate: 0 // this means the user can select any number of days from today
+}); // select by the id #modalDueDate and implements the method
 
 // load tasks for the first time
 loadTasks();
