@@ -33,7 +33,7 @@ var loadTasks = function() {
 
   // loop over object properties
   $.each(tasks, function(list, arr) {
-    console.log(list, arr);
+    // console.log(list, arr);
     // then loop over sub-array
     arr.forEach(function(task) {
       createTask(task.text, task.date, list);
@@ -57,7 +57,7 @@ $(".list-group").on("click", "p", function () {
 
   $(this).replaceWith(textInput);
   textInput.trigger("focus");
-  console.log(text);
+  // console.log(text);
 });
 
 // save task when clicking out of the text area form
@@ -194,16 +194,16 @@ $(".card .list-group").sortable({ // selects elements with the class .list-group
   tolerance: "pointer",
   helper: "clone",
   activate: function (event) {
-    console.log("activate", this);
+    // console.log("activate", this);
   },
   deactivate: function (event) {
-    console.log("deactivate", this);
+    // console.log("deactivate", this);
   },
   over: function (event) {
-    console.log("over", event.target);
+    // console.log("over", event.target);
   },
   out: function (event) {
-    console.log("out", event.target);
+    // console.log("out", event.target);
   },
   update: function (event) {
     // array to store the task data in
@@ -236,6 +236,22 @@ $(".card .list-group").sortable({ // selects elements with the class .list-group
   // update array on tasks object and save
   tasks[arrName] = tempArr;
   saveTasks();}
+});
+
+// makes the trash element a droppable widget
+$("#trash").droppable({
+  accept: ".card .list-group-item",
+  tolerance: "touch",
+  drop: function(event, ui) {
+    // console.log("drop");
+    ui.draggable.remove();
+  },
+  over: function(event, ui) {
+    // console.log("over");
+  },
+  out: function(event, ui) {
+    // console.log("out");
+  }
 });
 
 // load tasks for the first time
