@@ -232,19 +232,19 @@ $(".card .list-group").sortable({ // selects elements with the class .list-group
   scroll: false,
   tolerance: "pointer",
   helper: "clone",
-  activate: function (event) {
-    // console.log("activate", this);
-  },
-  deactivate: function (event) {
-    // console.log("deactivate", this);
-  },
+  activate: function () {
+    $(this).addClass("dropover");
+    },
+  deactivate: function () {
+    $(this).removeClass("dropover");
+    },
   over: function (event) {
-    // console.log("over", event.target);
-  },
+    $(event.target).addClass("dropover-active");
+    },
   out: function (event) {
-    // console.log("out", event.target);
-  },
-  update: function (event) {
+    $(event.target).removeClass("dropover-active");
+    },
+  update: function () {
     // array to store the task data in
     var tempArr = [];
 
@@ -297,6 +297,14 @@ $("#trash").droppable({
 $("#modalDueDate").datepicker({
   minDate: 0 // this means the user can select any number of days from today
 }); // select by the id #modalDueDate and implements the method
+
+// repeats the auditTask function on every task <li> element every 30 minutes
+setInterval(function() {
+  $(".card .list-group-item").each(function(index, el) {
+    auditTask(el);
+  });
+}, 1800000);
+
 
 // load tasks for the first time
 loadTasks();
